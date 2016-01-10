@@ -41,7 +41,7 @@ EXTRA_HP = 100
 BOT_EXTRA_HP = 400
 
 def load():
-    SayText2('%s{0}%s: Plugin Loaded'.format(info.name) % (Color(0,255,255), Color(0,200,255))).send()
+    SayText2('%s{0}%s: Plugin Loaded'.format(info.name) % (Color(0,153,0), Color(0,200,255))).send()
 
 def unload():
     SayText2('{0}: Plugin Unloaded'.format(info.name)).send()
@@ -97,7 +97,8 @@ def on_event(game_event):
     userid = game_event.get_int("userid")
     index = index_from_userid(userid)
     player = Player(index)
-    SayText2("{0} has left. Reason: {1}".format(player.name, game_event.get_string("reason"))).send()
+    reason = game_event.get_string("reason")
+    SayText2("%s {0} %shas left. Reason: \"%s{1}%s\"".format(player.name, reason) % (Color(0,153,0), Color(255,255,51), Color(255,255,255), Color(255,255,51))).send()
     return CommandReturn.BLOCK
 
 @SayCommand((CHAT_COMMAND, "!{0}".format(CHAT_COMMAND)))
