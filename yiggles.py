@@ -11,6 +11,8 @@ from commands.client import ClientCommand, ClientCommandFilter
 from commands.server import ServerCommand
 from commands import CommandReturn
 
+from colors import Color
+
 from listeners.tick import Delay
 
 from filters.recipients import RecipientFilter
@@ -33,15 +35,16 @@ CHAT_COMMAND = "cut"
 CLIENT_COMMAND = "kill"
 HEALTH_COMMAND = "sethealth"
 MENU_COMMAND = "menu"
+RESPAWN_COMMAND = "respawn"
 
 EXTRA_HP = 100
 BOT_EXTRA_HP = 400
 
 def load():
-    SayText2('{0}:\x01Plugin \x04Loaded'.format(info.name)).send()
+    SayText2('%s{0}%s: Plugin Loaded'.format(info.name) % (Color(0,255,255), Color(0,200,255))).send()
 
 def unload():
-    SayText2('{0}: \x02Plugin \x03Unloaded'.format(info.name)).send()
+    SayText2('{0}: Plugin Unloaded'.format(info.name)).send()
     
 @Event("round_start")
 def greeting(game_event):
@@ -65,7 +68,6 @@ def player_spawn(game_event):
 @SayCommand(("/kill"))
 def on_command(command, index, team_only):
     player = Player(index)
-    player.kill()
 
 @Event("player_death")
 def respawn_bots(game_event):
@@ -78,8 +80,12 @@ def respawn_bots(game_event):
             Delay(2, player=Player(index))
             player.respawn()
 
-@SayCommand(("/wave", "!wave"))
+@SayCommand(("/{0}".format(RESPAWN_COMMAND), "!{0}".format(RESPAWN_COMMAND)))
 def on_command(command, index, team_only):
+    player = Player(index)
+    player.respawn()
+    if command[0][0] == "/":
+        return CommandReturn.BLOCK
     
 
 @SayCommand((MENU_COMMAND, "!{0}".format(MENU_COMMAND)))
@@ -91,7 +97,7 @@ def on_event(game_event):
     userid = game_event.get_int("userid")
     index = index_from_userid(userid)
     player = Player(index)
-    SayText2("{0} has left. Reason: {1}".format(player.name, game_event["reason"]))
+    SayText2("{0} has left. Reason: {1}".format(player.name, game_event.get_string("reason"))).send()
     return CommandReturn.BLOCK
 
 @SayCommand((CHAT_COMMAND, "!{0}".format(CHAT_COMMAND)))
@@ -114,7 +120,6 @@ def on_command(command, index, team_only):
     player.health += 99999999
     SayText2("{0} has activated god mode... Beware.".format(player.name)).send()
 
-@
 
 #Tells players when a player has been blinded
 @Event("player_blind")
@@ -128,7 +133,7 @@ def stevie_wonder(game_event):
 @SayCommand((HEALTH_COMMAND, "!{0}".format(HEALTH_COMMAND)))
 def on_command(command, index, team_only):
     player = Player(index)
-    
+
 
 #Don't let jerks kill hostages
 @Event("hostage_killed")
